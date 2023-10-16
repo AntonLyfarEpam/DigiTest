@@ -6,13 +6,25 @@
 //
 
 import Foundation
+import Combine
 
 protocol CatalogRepository {
-
+    func f()
 }
 
 class DefaultCatalogRepository {
+    private var subscriptions = Set<AnyCancellable>()
 
+    func f() {
+        DefaultCatalogService()
+            .fetchItems()
+            .sink(receiveCompletion: { _ in
+
+            }, receiveValue: { response in
+
+            })
+            .store(in: &subscriptions)
+    }
 }
 
 extension DefaultCatalogRepository: CatalogRepository {

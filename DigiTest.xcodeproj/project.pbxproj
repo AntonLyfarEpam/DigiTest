@@ -10,6 +10,7 @@
 		4787AF2F2ADDA2590074C4C5 /* CatalogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF2E2ADDA2590074C4C5 /* CatalogView.swift */; };
 		4787AF312ADDA9EA0074C4C5 /* CatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF302ADDA9EA0074C4C5 /* CatalogViewModel.swift */; };
 		4787AF332ADDAE4A0074C4C5 /* CatalogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF322ADDAE4A0074C4C5 /* CatalogRepository.swift */; };
+		4787AF352ADDBFD80074C4C5 /* CatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF342ADDBFD80074C4C5 /* CatalogService.swift */; };
 		47C31F6D2ADD6D060023FD73 /* DigiTestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F6C2ADD6D060023FD73 /* DigiTestApp.swift */; };
 		47C31F6F2ADD6D060023FD73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F6E2ADD6D060023FD73 /* ContentView.swift */; };
 		47C31F712ADD6D070023FD73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47C31F702ADD6D070023FD73 /* Assets.xcassets */; };
@@ -22,6 +23,7 @@
 		4787AF2E2ADDA2590074C4C5 /* CatalogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogView.swift; sourceTree = "<group>"; };
 		4787AF302ADDA9EA0074C4C5 /* CatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViewModel.swift; sourceTree = "<group>"; };
 		4787AF322ADDAE4A0074C4C5 /* CatalogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogRepository.swift; sourceTree = "<group>"; };
+		4787AF342ADDBFD80074C4C5 /* CatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogService.swift; sourceTree = "<group>"; };
 		47C31F692ADD6D060023FD73 /* DigiTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DigiTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C31F6C2ADD6D060023FD73 /* DigiTestApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigiTestApp.swift; sourceTree = "<group>"; };
 		47C31F6E2ADD6D060023FD73 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -48,6 +50,7 @@
 				4787AF2E2ADDA2590074C4C5 /* CatalogView.swift */,
 				4787AF302ADDA9EA0074C4C5 /* CatalogViewModel.swift */,
 				4787AF322ADDAE4A0074C4C5 /* CatalogRepository.swift */,
+				4787AF342ADDBFD80074C4C5 /* CatalogService.swift */,
 			);
 			path = Catalog;
 			sourceTree = "<group>";
@@ -163,6 +166,7 @@
 				47C31F762ADD6D070023FD73 /* Persistence.swift in Sources */,
 				47C31F6F2ADD6D060023FD73 /* ContentView.swift in Sources */,
 				4787AF312ADDA9EA0074C4C5 /* CatalogViewModel.swift in Sources */,
+				4787AF352ADDBFD80074C4C5 /* CatalogService.swift in Sources */,
 				4787AF332ADDAE4A0074C4C5 /* CatalogRepository.swift in Sources */,
 				47C31F792ADD6D070023FD73 /* DigiTest.xcdatamodeld in Sources */,
 				47C31F6D2ADD6D060023FD73 /* DigiTestApp.swift in Sources */,

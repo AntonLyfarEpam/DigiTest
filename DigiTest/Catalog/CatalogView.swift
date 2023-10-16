@@ -12,6 +12,9 @@ struct CatalogView: View {
     private var viewModel = CatalogViewModel()
 
     var body: some View {
-        EmptyView()
+        Color.red
+            .onAppear {
+                viewModel.f()
+            }
     }
 }

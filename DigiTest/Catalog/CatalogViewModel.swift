@@ -19,6 +19,10 @@ final class CatalogViewModel: ObservableObject {
     init(with repository: CatalogRepository = DefaultCatalogRepository()) {
         self.repository = repository
     }
+
+    func f() {
+        repository.f()
+    }
 }
 
 extension CatalogViewModel {
