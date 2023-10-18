@@ -13,13 +13,19 @@ protocol CatalogService {
 }
 
 class DefaultCatalogService: CatalogService {
-    func fetchItems(lastId: String?) -> AnyPublisher<[CatalogItemResponseModel], Error> {
+    func fetchItems(lastId: String? = nil) -> AnyPublisher<[CatalogItemResponseModel], Error> {
         ApiRequest.execute(
             url: URL(string: "https://marlove.net/e/mock/v1/items")!,
-            queryItems: [URLQueryItem(name: "since_id", value: lastId)]
+            queryItems: queryItems(lastId: lastId)
         )
         .mapError { $0 }
         .eraseToAnyPublisher()
+    }
+
+    private func queryItems(lastId: String?) -> [URLQueryItem] {
+        guard let lastId else { return [] }
+
+        return [URLQueryItem(name: "since_id", value: lastId)]
     }
 }
 

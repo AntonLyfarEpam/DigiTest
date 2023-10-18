@@ -10,7 +10,7 @@ import CoreData
 
 protocol CatalogStorage {
     func fetchItems() -> [CatalogItemDataModel]
-    func update(with items: [CatalogItemDataModel])
+    func update(with items: [CatalogItemDataModel], onCompletion: @escaping (StorageUpdateResult) -> Void)
 }
 
 class DefaultCatalogStorage: CatalogStorage {
@@ -21,7 +21,7 @@ class DefaultCatalogStorage: CatalogStorage {
         return items.compactMap(\.dataModel)
     }
 
-    func update(with items: [CatalogItemDataModel]) {
+    func update(with items: [CatalogItemDataModel], onCompletion: @escaping (StorageUpdateResult) -> Void) {
         let context = CoreDataController.shared.privateContext
 
         context.performAndWait {
@@ -34,11 +34,11 @@ class DefaultCatalogStorage: CatalogStorage {
                 let ids = insertResult?.result as? [NSManagedObjectID]
                 let isUpdated = ids?.isEmpty == false
 
-//                onCompletion(isUpdated ? .itemsUpdated : .noChanges)
+                onCompletion(isUpdated ? .itemsUpdated : .noChanges)
 
             } catch let error as NSError {
                 print(error.localizedDescription)
-//                onCompletion(.storageError)
+                onCompletion(.storageError)
             }
         }
     }

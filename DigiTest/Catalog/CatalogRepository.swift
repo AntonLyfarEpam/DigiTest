@@ -42,28 +42,28 @@ extension DefaultCatalogRepository: CatalogRepository {
         service
             .fetchItems(lastId: lastId)
             .replaceError(with: [])
-            .handleEvents(receiveOutput: { [storage] models in
-                storage.update(with: models.map(\.dataModel))
-            })
-//            .flatMap { [storage] models in
-//                Deferred {
-//                    Future<[CatalogItemResponseModel], Never> { promise in
-//                        storage.update(with: models.map(\.dataModel)) { result in
-//                            switch result {
-//                            case .noChanges:
-//                                promise(.success([]))
-//                            case .itemsUpdated:
-//                                promise(.success(models))
-//                            case .storageError:
-//                                promise(.success([]))
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            .filter { models in
-//                models.isEmpty == false
-//            }
+//            .handleEvents(receiveOutput: { [storage] models in
+//                storage.update(with: models.map(\.dataModel))
+//            })
+            .flatMap { [storage] models in
+                Deferred {
+                    Future<[CatalogItemResponseModel], Never> { promise in
+                        storage.update(with: models.map(\.dataModel)) { result in
+                            switch result {
+                            case .noChanges:
+                                promise(.success([]))
+                            case .itemsUpdated:
+                                promise(.success(models))
+                            case .storageError:
+                                promise(.success([]))
+                            }
+                        }
+                    }
+                }
+            }
+            .filter { models in
+                models.isEmpty == false
+            }
             .map {
                 let items =
                 $0.map { item in
