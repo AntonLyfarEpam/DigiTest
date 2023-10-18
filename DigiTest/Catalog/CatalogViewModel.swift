@@ -9,32 +9,44 @@ import Foundation
 import Combine
 
 final class CatalogViewModel: ObservableObject {
+    @Published var items = [Item]()
+
     private let repository: CatalogRepository
 
-    private var subscriptions = Set<AnyCancellable>()
-
-    @Published
-    var items = [Item]()
+    private var currentLastId: String?
+    private var itemsSubscription: AnyCancellable?
 
     init(with repository: CatalogRepository = DefaultCatalogRepository()) {
         self.repository = repository
+
+        loadItems()
     }
 
-    func f() {
-        repository
-            .retrieveItems(lastId: nil)
-            .sink { entities in
-                print(entities.count)
+    func refresh() {
+        loadItems(refresh: true)
+    }
+
+    private func loadItems(refresh: Bool = false) {
+        itemsSubscription = repository
+            .retrieveItems(lastId: currentLastId, refresh: false)
+            .sink { [weak self] entities in
+                self?.items = entities.map(\.item)
             }
-            .store(in: &subscriptions)
     }
 }
 
 extension CatalogViewModel {
-    struct Item {
+    struct Item: Identifiable, Hashable {
         let id: String
         let text: String
-        let image: String
+        let image: URL?
         let confidence: Float
+    }
+}
+
+
+private extension CatalogItemEntity {
+    var item: CatalogViewModel.Item {
+        .init(id: id, text: text, image: image, confidence: confidence)
     }
 }

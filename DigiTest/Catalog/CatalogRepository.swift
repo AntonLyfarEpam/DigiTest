@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 protocol CatalogRepository {
-    func retrieveItems(lastId: String?) -> AnyPublisher<[CatalogItemEntity], Never>
+    func retrieveItems(lastId: String?, refresh: Bool) -> AnyPublisher<[CatalogItemEntity], Never>
 }
 
 class DefaultCatalogRepository {
@@ -28,35 +28,40 @@ class DefaultCatalogRepository {
 }
 
 extension DefaultCatalogRepository: CatalogRepository {
-    func retrieveItems(lastId: String?) -> AnyPublisher<[CatalogItemEntity], Never> {
+    func retrieveItems(
+        lastId: String?,
+        refresh: Bool
+    ) -> AnyPublisher<[CatalogItemEntity], Never> {
+        retrieveStoredItems(lastId: lastId)
+            .merge(with: retrieveRemoteItems(lastId: lastId, refresh: refresh))
+            .eraseToAnyPublisher()
+    }
+
+    private func retrieveStoredItems(
+        lastId: String?
+    ) -> AnyPublisher<[CatalogItemEntity], Never> {
         Just(
             storage
                 .fetchItems()
                 .map(\.entity)
         )
-        .merge(with: retrieveRemoteItems(lastId: lastId))
         .eraseToAnyPublisher()
     }
 
-    private func retrieveRemoteItems(lastId: String?) -> AnyPublisher<[CatalogItemEntity], Never> {
+    private func retrieveRemoteItems(
+        lastId: String?,
+        refresh: Bool
+    ) -> AnyPublisher<[CatalogItemEntity], Never> {
         service
             .fetchItems(lastId: lastId)
             .replaceError(with: [])
-//            .handleEvents(receiveOutput: { [storage] models in
-//                storage.update(with: models.map(\.dataModel))
-//            })
             .flatMap { [storage] models in
-                Deferred {
-                    Future<[CatalogItemResponseModel], Never> { promise in
-                        storage.update(with: models.map(\.dataModel)) { result in
-                            switch result {
-                            case .noChanges:
-                                promise(.success([]))
-                            case .itemsUpdated:
-                                promise(.success(models))
-                            case .storageError:
-                                promise(.success([]))
-                            }
+                Future<[CatalogItemResponseModel], Never> { promise in
+                    storage.update(with: models.map(\.dataModel)) { result in
+                        if refresh || result == .itemsUpdated {
+                            promise(.success(models))
+                        } else {
+                            promise(.success([]))
                         }
                     }
                 }
@@ -64,20 +69,21 @@ extension DefaultCatalogRepository: CatalogRepository {
             .filter { models in
                 models.isEmpty == false
             }
-            .map {
-                let items =
-                $0.map { item in
-                    CatalogItemEntity(
-                        id: item.id,
-                        text: item.text,
-                        image: URL(string: item.image),
-                        confidence: item.confidence
-                    )
-                }
-
-                return [items.first].compactMap { $0 }
+            .map { models in
+                models.map(\.entity)
             }
             .eraseToAnyPublisher()
+    }
+
+    private func updateStorage(
+        with models: [CatalogItemResponseModel]
+    ) -> AnyPublisher<[CatalogItemResponseModel], Never> {
+        Future { [storage] promise in
+            storage.update(with: models.map(\.dataModel)) { result in
+                promise(.success(result == .itemsUpdated ? models : []))
+            }
+        }
+        .eraseToAnyPublisher()
     }
 }
 
@@ -90,23 +96,17 @@ struct CatalogItemEntity: Codable {
 
 private extension CatalogItemResponseModel {
     var dataModel: CatalogItemDataModel {
-        .init(
-            id: id,
-            text: text,
-            image: image,
-            confidence: confidence
-        )
+        .init(id: id, text: text, image: image, confidence: confidence)
+    }
+
+    var entity: CatalogItemEntity {
+        .init(id: id, text: text, image: URL(string: image), confidence: confidence)
     }
 }
 
 private extension CatalogItemDataModel {
     var entity: CatalogItemEntity {
-        .init(
-            id: id,
-            text: text,
-            image: imageURL,
-            confidence: confidence
-        )
+        .init(id: id, text: text, image: imageURL, confidence: confidence)
     }
 
     private var imageURL: URL? {
