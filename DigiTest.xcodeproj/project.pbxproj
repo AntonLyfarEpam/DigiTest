@@ -11,11 +11,13 @@
 		4787AF312ADDA9EA0074C4C5 /* CatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF302ADDA9EA0074C4C5 /* CatalogViewModel.swift */; };
 		4787AF332ADDAE4A0074C4C5 /* CatalogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF322ADDAE4A0074C4C5 /* CatalogRepository.swift */; };
 		4787AF352ADDBFD80074C4C5 /* CatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF342ADDBFD80074C4C5 /* CatalogService.swift */; };
+		4787AF372ADEAE800074C4C5 /* CatalogStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF362ADEAE800074C4C5 /* CatalogStorage.swift */; };
+		4787AF3E2AE00F2D0074C4C5 /* ApiRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787AF3D2AE00F2D0074C4C5 /* ApiRequest.swift */; };
 		47C31F6D2ADD6D060023FD73 /* DigiTestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F6C2ADD6D060023FD73 /* DigiTestApp.swift */; };
 		47C31F6F2ADD6D060023FD73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F6E2ADD6D060023FD73 /* ContentView.swift */; };
 		47C31F712ADD6D070023FD73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47C31F702ADD6D070023FD73 /* Assets.xcassets */; };
 		47C31F742ADD6D070023FD73 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47C31F732ADD6D070023FD73 /* Preview Assets.xcassets */; };
-		47C31F762ADD6D070023FD73 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F752ADD6D070023FD73 /* Persistence.swift */; };
+		47C31F762ADD6D070023FD73 /* CoreDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F752ADD6D070023FD73 /* CoreDataController.swift */; };
 		47C31F792ADD6D070023FD73 /* DigiTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 47C31F772ADD6D070023FD73 /* DigiTest.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
@@ -24,12 +26,14 @@
 		4787AF302ADDA9EA0074C4C5 /* CatalogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogViewModel.swift; sourceTree = "<group>"; };
 		4787AF322ADDAE4A0074C4C5 /* CatalogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogRepository.swift; sourceTree = "<group>"; };
 		4787AF342ADDBFD80074C4C5 /* CatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogService.swift; sourceTree = "<group>"; };
+		4787AF362ADEAE800074C4C5 /* CatalogStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogStorage.swift; sourceTree = "<group>"; };
+		4787AF3D2AE00F2D0074C4C5 /* ApiRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiRequest.swift; sourceTree = "<group>"; };
 		47C31F692ADD6D060023FD73 /* DigiTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DigiTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		47C31F6C2ADD6D060023FD73 /* DigiTestApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DigiTestApp.swift; sourceTree = "<group>"; };
 		47C31F6E2ADD6D060023FD73 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		47C31F702ADD6D070023FD73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		47C31F732ADD6D070023FD73 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		47C31F752ADD6D070023FD73 /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		47C31F752ADD6D070023FD73 /* CoreDataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataController.swift; sourceTree = "<group>"; };
 		47C31F782ADD6D070023FD73 /* DigiTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DigiTest.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -51,8 +55,18 @@
 				4787AF302ADDA9EA0074C4C5 /* CatalogViewModel.swift */,
 				4787AF322ADDAE4A0074C4C5 /* CatalogRepository.swift */,
 				4787AF342ADDBFD80074C4C5 /* CatalogService.swift */,
+				4787AF362ADEAE800074C4C5 /* CatalogStorage.swift */,
 			);
 			path = Catalog;
+			sourceTree = "<group>";
+		};
+		4787AF382ADEAF4A0074C4C5 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				47C31F752ADD6D070023FD73 /* CoreDataController.swift */,
+				4787AF3D2AE00F2D0074C4C5 /* ApiRequest.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		47C31F602ADD6D060023FD73 = {
@@ -74,11 +88,11 @@
 		47C31F6B2ADD6D060023FD73 /* DigiTest */ = {
 			isa = PBXGroup;
 			children = (
-				4787AF2D2ADDA2110074C4C5 /* Catalog */,
 				47C31F6C2ADD6D060023FD73 /* DigiTestApp.swift */,
+				4787AF382ADEAF4A0074C4C5 /* Utils */,
+				4787AF2D2ADDA2110074C4C5 /* Catalog */,
 				47C31F6E2ADD6D060023FD73 /* ContentView.swift */,
 				47C31F702ADD6D070023FD73 /* Assets.xcassets */,
-				47C31F752ADD6D070023FD73 /* Persistence.swift */,
 				47C31F772ADD6D070023FD73 /* DigiTest.xcdatamodeld */,
 				47C31F722ADD6D070023FD73 /* Preview Content */,
 			);
@@ -163,13 +177,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47C31F762ADD6D070023FD73 /* Persistence.swift in Sources */,
+				47C31F762ADD6D070023FD73 /* CoreDataController.swift in Sources */,
 				47C31F6F2ADD6D060023FD73 /* ContentView.swift in Sources */,
 				4787AF312ADDA9EA0074C4C5 /* CatalogViewModel.swift in Sources */,
+				4787AF372ADEAE800074C4C5 /* CatalogStorage.swift in Sources */,
 				4787AF352ADDBFD80074C4C5 /* CatalogService.swift in Sources */,
 				4787AF332ADDAE4A0074C4C5 /* CatalogRepository.swift in Sources */,
 				47C31F792ADD6D070023FD73 /* DigiTest.xcdatamodeld in Sources */,
 				47C31F6D2ADD6D060023FD73 /* DigiTestApp.swift in Sources */,
+				4787AF3E2AE00F2D0074C4C5 /* ApiRequest.swift in Sources */,
 				4787AF2F2ADDA2590074C4C5 /* CatalogView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

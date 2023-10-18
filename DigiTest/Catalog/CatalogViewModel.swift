@@ -29,7 +29,7 @@ extension CatalogViewModel {
     struct Item {
         let id: String
         let text: String
-        let image: URL
+        let image: String
         let confidence: Float
     }
 }
