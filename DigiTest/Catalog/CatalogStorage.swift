@@ -9,43 +9,41 @@ import Foundation
 import CoreData
 
 protocol CatalogStorage {
-
+    func fetchItems() -> [CatalogItemDataModel]
+    func update(with items: [CatalogItemDataModel])
 }
 
-class DefaultCatalogStorage {
-    func fetchItems() -> [ItemDataModel] {
+class DefaultCatalogStorage: CatalogStorage {
+    func fetchItems() -> [CatalogItemDataModel] {
         let context = CoreDataController.shared.managedContext
-        let items = try? context.fetch(Item.fetchRequest())
-        let itemDataModels = items?.map { item in
-            ItemDataModel(
-                id: item.id!,
-                text: item.text!,
-                image: item.image!,
-                confidence: item.confidence
-            )
-        }
+        guard let items = try? context.fetch(Item.fetchRequest()) else { return [] }
 
-        return itemDataModels ?? []
+        return items.compactMap(\.dataModel)
     }
 
-    func save(items: [ItemDataModel]) {
+    func update(with items: [CatalogItemDataModel]) {
         let context = CoreDataController.shared.privateContext
 
         context.performAndWait {
             let request = NSBatchInsertRequest(entityName: "Item", objects: encode(items: items))
             request.resultType = .objectIDs
+
             do {
                 let result = try context.execute(request)
                 let insertResult = result as? NSBatchInsertResult
                 let ids = insertResult?.result as? [NSManagedObjectID]
-                print(result as? NSBatchInsertResult)
+                let isUpdated = ids?.isEmpty == false
+
+//                onCompletion(isUpdated ? .itemsUpdated : .noChanges)
+
             } catch let error as NSError {
                 print(error.localizedDescription)
+//                onCompletion(.storageError)
             }
         }
     }
 
-    private func encode(items: [ItemDataModel]) -> [[String:Any]] {
+    private func encode(items: [CatalogItemDataModel]) -> [[String:Any]] {
         let jsonEncoder = JSONEncoder()
         guard let jsonData = try? jsonEncoder.encode(items) else { return [] }
 
@@ -58,11 +56,28 @@ class DefaultCatalogStorage {
     }
 }
 
-extension DefaultCatalogStorage: CatalogStorage {
-    struct ItemDataModel: Codable {
-        let id: String
-        let text: String
-        let image: String
-        let confidence: Float
+enum StorageUpdateResult {
+    case noChanges
+    case itemsUpdated
+    case storageError
+}
+
+struct CatalogItemDataModel: Codable {
+    let id: String
+    let text: String
+    let image: String?
+    let confidence: Float
+}
+
+private extension Item {
+    var dataModel: CatalogItemDataModel? {
+        guard let id, let text else { return nil }
+
+        return .init(
+            id: id,
+            text: text,
+            image: image,
+            confidence: confidence
+        )
     }
 }

@@ -12,11 +12,7 @@ protocol CatalogService {
     func fetchItems(lastId: String?) -> AnyPublisher<[CatalogItemResponseModel], Error>
 }
 
-class DefaultCatalogService {
-
-}
-
-extension DefaultCatalogService: CatalogService {
+class DefaultCatalogService: CatalogService {
     func fetchItems(lastId: String?) -> AnyPublisher<[CatalogItemResponseModel], Error> {
         ApiRequest.execute(
             url: URL(string: "https://marlove.net/e/mock/v1/items")!,

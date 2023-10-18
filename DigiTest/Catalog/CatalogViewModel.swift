@@ -21,7 +21,12 @@ final class CatalogViewModel: ObservableObject {
     }
 
     func f() {
-        repository.f()
+        repository
+            .retrieveItems(lastId: nil)
+            .sink { entities in
+                print(entities.count)
+            }
+            .store(in: &subscriptions)
     }
 }
 
