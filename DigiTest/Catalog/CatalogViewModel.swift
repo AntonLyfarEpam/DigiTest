@@ -10,6 +10,7 @@ import Combine
 
 final class CatalogViewModel: ObservableObject {
     @Published var items = [Item]()
+    @Published var isLoading = false
 
     private let repository: CatalogRepository
 
@@ -26,11 +27,19 @@ final class CatalogViewModel: ObservableObject {
         loadItems(refresh: true)
     }
 
-    private func loadItems(refresh: Bool = false) {
+    func lastItemShown() {
+        loadItems(lastId: currentLastId)
+    }
+
+    private func loadItems(lastId: String? = nil, refresh: Bool = false) {
+        isLoading = true
         itemsSubscription = repository
-            .retrieveItems(lastId: currentLastId, refresh: false)
+            .retrieveItems(lastId: nil, maxId: lastId, refresh: false)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] entities in
                 self?.items = entities.map(\.item)
+                self?.currentLastId = entities.last?.id
+                self?.isLoading = false
             }
     }
 }

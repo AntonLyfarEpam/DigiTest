@@ -12,39 +12,60 @@ struct CatalogView: View {
 
     var body: some View {
         ScrollView {
-            VStack {
+            LazyVStack {
                 ForEach(viewModel.items) { item in
-                    HStack {
-                        AsyncImage(url: item.image) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                            default:
-                                ProgressView()
-                            }
-                        }
-                        .frame(width: 150, height: 80)
-                        .cornerRadius(10)
-                        .clipped()
-
-                        VStack(alignment: .leading) {
-                            Text(item.text)
-                            Spacer()
-                            Text(String(format: "Confidence: %.2f", item.confidence))
-                        }.padding()
-
-                        Spacer()
-                    }
-                    .padding(.horizontal)
+                    ItemView(text: item.text, image: item.image, confidence: item.confidence)
                 }
+
+                HStack {
+                    if viewModel.isLoading {
+                        ProgressView()
+                    }
+                }
+                .onAppear {
+                    viewModel.lastItemShown()
+                }
+                .frame(maxHeight: 30)
             }
         }
         .refreshable {
             viewModel.refresh()
         }
     }
+}
+
+struct ItemView: View {
+    let text: String
+    let image: URL?
+    let confidence: Float
+
+    var body: some View {
+        HStack {
+            AsyncImage(url: image) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                default:
+                    ProgressView()
+                }
+            }
+            .frame(width: 150, height: 280)
+            .cornerRadius(10)
+            .clipped()
+
+            VStack(alignment: .leading) {
+                Text(text)
+                Spacer()
+                Text(String(format: "Confidence: %.2f", confidence))
+            }.padding()
+
+            Spacer()
+        }
+        .padding(.horizontal)
+    }
+
 }
 
 #Preview {

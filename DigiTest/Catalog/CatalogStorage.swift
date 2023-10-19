@@ -22,6 +22,11 @@ class DefaultCatalogStorage: CatalogStorage {
     }
 
     func update(with items: [CatalogItemDataModel], onCompletion: @escaping (StorageUpdateResult) -> Void) {
+        guard items.isEmpty == false else {
+            onCompletion(.noChanges)
+            return
+        }
+
         let context = CoreDataController.shared.privateContext
 
         context.performAndWait {
@@ -73,11 +78,6 @@ private extension Item {
     var dataModel: CatalogItemDataModel? {
         guard let id, let text else { return nil }
 
-        return .init(
-            id: id,
-            text: text,
-            image: image,
-            confidence: confidence
-        )
+        return .init(id: id, text: text, image: image, confidence: confidence)
     }
 }

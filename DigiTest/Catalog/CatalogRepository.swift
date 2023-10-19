@@ -9,7 +9,11 @@ import Foundation
 import Combine
 
 protocol CatalogRepository {
-    func retrieveItems(lastId: String?, refresh: Bool) -> AnyPublisher<[CatalogItemEntity], Never>
+    func retrieveItems(
+        lastId: String?,
+        maxId: String?,
+        refresh: Bool
+    ) -> AnyPublisher<[CatalogItemEntity], Never>
 }
 
 class DefaultCatalogRepository {
@@ -30,30 +34,31 @@ class DefaultCatalogRepository {
 extension DefaultCatalogRepository: CatalogRepository {
     func retrieveItems(
         lastId: String?,
+        maxId: String?,
         refresh: Bool
     ) -> AnyPublisher<[CatalogItemEntity], Never> {
-        retrieveStoredItems(lastId: lastId)
-            .merge(with: retrieveRemoteItems(lastId: lastId, refresh: refresh))
-            .eraseToAnyPublisher()
-    }
-
-    private func retrieveStoredItems(
-        lastId: String?
-    ) -> AnyPublisher<[CatalogItemEntity], Never> {
-        Just(
-            storage
-                .fetchItems()
-                .map(\.entity)
+        Publishers.Merge(
+            retrieveStoredItems(lastId: lastId, maxId: maxId),
+            retrieveRemoteItems(lastId: lastId, maxId: maxId, refresh: refresh)
         )
         .eraseToAnyPublisher()
     }
 
+    private func retrieveStoredItems(
+        lastId: String?,
+        maxId: String?
+    ) -> AnyPublisher<[CatalogItemEntity], Never> {
+        Just(storage.fetchItems().map(\.entity))
+            .eraseToAnyPublisher()
+    }
+
     private func retrieveRemoteItems(
         lastId: String?,
+        maxId: String?,
         refresh: Bool
     ) -> AnyPublisher<[CatalogItemEntity], Never> {
         service
-            .fetchItems(lastId: lastId)
+            .fetchItems(lastId: lastId, maxId: maxId)
             .replaceError(with: [])
             .flatMap { [storage] models in
                 Future<[CatalogItemResponseModel], Never> { promise in
