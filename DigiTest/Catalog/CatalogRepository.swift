@@ -9,11 +9,7 @@ import Foundation
 import Combine
 
 protocol CatalogRepository {
-    func retrieveItems(
-        lastId: String?,
-        maxId: String?,
-        refresh: Bool
-    ) -> AnyPublisher<[CatalogItemEntity], Never>
+    func retrieveItems(maxId: String?, refresh: Bool) -> AnyPublisher<[CatalogItemEntity], Never>
 }
 
 class DefaultCatalogRepository {
@@ -32,51 +28,39 @@ class DefaultCatalogRepository {
 }
 
 extension DefaultCatalogRepository: CatalogRepository {
-    func retrieveItems(
-        lastId: String?,
-        maxId: String?,
-        refresh: Bool
-    ) -> AnyPublisher<[CatalogItemEntity], Never> {
+    func retrieveItems(maxId: String?, refresh: Bool) -> AnyPublisher<[CatalogItemEntity], Never> {
         Publishers.Merge(
-            retrieveStoredItems(lastId: lastId, maxId: maxId),
-            retrieveRemoteItems(lastId: lastId, maxId: maxId, refresh: refresh)
+            retrieveStoredItems(),
+            retrieveRemoteItems(maxId: maxId, refresh: refresh)
         )
         .eraseToAnyPublisher()
     }
 
-    private func retrieveStoredItems(
-        lastId: String?,
-        maxId: String?
-    ) -> AnyPublisher<[CatalogItemEntity], Never> {
+    private func retrieveStoredItems() -> AnyPublisher<[CatalogItemEntity], Never> {
         Just(storage.fetchItems().map(\.entity))
             .eraseToAnyPublisher()
     }
 
     private func retrieveRemoteItems(
-        lastId: String?,
         maxId: String?,
         refresh: Bool
     ) -> AnyPublisher<[CatalogItemEntity], Never> {
         service
-            .fetchItems(lastId: lastId, maxId: maxId)
+            .fetchItems(maxId: maxId)
             .replaceError(with: [])
             .flatMap { [storage] models in
-                Future<[CatalogItemResponseModel], Never> { promise in
+                Future { promise in
                     storage.update(with: models.map(\.dataModel)) { result in
                         if refresh || result == .itemsUpdated {
-                            promise(.success(models))
+                            let entities = storage.fetchItems().map(\.entity)
+                            promise(.success(entities))
                         } else {
                             promise(.success([]))
                         }
                     }
                 }
             }
-            .filter { models in
-                models.isEmpty == false
-            }
-            .map { models in
-                models.map(\.entity)
-            }
+            .filter { $0.isEmpty == false }
             .eraseToAnyPublisher()
     }
 

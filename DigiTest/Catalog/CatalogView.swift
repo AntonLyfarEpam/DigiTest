@@ -14,7 +14,16 @@ struct CatalogView: View {
         ScrollView {
             LazyVStack {
                 ForEach(viewModel.items) { item in
-                    ItemView(text: item.text, image: item.image, confidence: item.confidence)
+                    ItemView(
+                        text: item.text,
+                        image: item.image,
+                        confidence: item.confidence
+                    )
+                    .onAppear {
+                        if item == viewModel.items.last {
+                            viewModel.lastItemShown()
+                        }
+                    }
                 }
 
                 HStack {
@@ -22,10 +31,6 @@ struct CatalogView: View {
                         ProgressView()
                     }
                 }
-                .onAppear {
-                    viewModel.lastItemShown()
-                }
-                .frame(maxHeight: 30)
             }
         }
         .refreshable {
@@ -51,7 +56,7 @@ struct ItemView: View {
                     ProgressView()
                 }
             }
-            .frame(width: 150, height: 280)
+            .frame(width: 150, height: 100)
             .cornerRadius(10)
             .clipped()
 
@@ -65,7 +70,6 @@ struct ItemView: View {
         }
         .padding(.horizontal)
     }
-
 }
 
 #Preview {

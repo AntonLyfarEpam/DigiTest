@@ -34,7 +34,7 @@ final class CatalogViewModel: ObservableObject {
     private func loadItems(lastId: String? = nil, refresh: Bool = false) {
         isLoading = true
         itemsSubscription = repository
-            .retrieveItems(lastId: nil, maxId: lastId, refresh: false)
+            .retrieveItems(maxId: lastId, refresh: false)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] entities in
                 self?.items = entities.map(\.item)
