@@ -9,12 +9,14 @@ import SwiftUI
 
 struct CatalogView: View {
     @StateObject private var viewModel = CatalogViewModel()
+    @State private var detailedItem: CatalogViewModel.Item?
 
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(viewModel.items) { item in
                     ItemView(
+                        id: item.id,
                         text: item.text,
                         image: item.image,
                         confidence: item.confidence
@@ -23,6 +25,9 @@ struct CatalogView: View {
                         if item == viewModel.items.last {
                             viewModel.lastItemShown()
                         }
+                    }
+                    .onTapGesture {
+                        detailedItem = item
                     }
                 }
 
@@ -36,39 +41,109 @@ struct CatalogView: View {
         .refreshable {
             viewModel.refresh()
         }
+        .sheet(item: $detailedItem) { item in
+            ItemDetailsView(
+                id: item.id,
+                text: item.text,
+                image: item.image,
+                confidence: item.confidence
+            )
+        }
     }
 }
 
-struct ItemView: View {
+private struct ItemView: View {
+    let id: String
     let text: String
     let image: URL?
     let confidence: Float
 
     var body: some View {
         HStack {
-            AsyncImage(url: image) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                default:
-                    ProgressView()
-                }
-            }
-            .frame(width: 150, height: 100)
-            .cornerRadius(10)
-            .clipped()
+            CatalogItemImageView(image: image)
+                .frame(width: 150, height: 100)
+                .cornerRadius(10)
 
-            VStack(alignment: .leading) {
-                Text(text)
-                Spacer()
-                Text(String(format: "Confidence: %.2f", confidence))
-            }.padding()
+            CatalogItemDescriptionView(
+                id: id,
+                text: text,
+                confidence: confidence
+            )
+            .padding()
 
             Spacer()
         }
         .padding(.horizontal)
+    }
+}
+
+private struct ItemDetailsView: View {
+    let id: String
+    let text: String
+    let image: URL?
+    let confidence: Float
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                CatalogItemImageView(image: image)
+                    .frame(height: 300)
+                    .padding()
+
+                HStack {
+                    CatalogItemDescriptionView(
+                        id: id,
+                        text: text,
+                        confidence: confidence
+                    )
+                    .padding()
+                    Spacer()
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+            .navigationTitle("Details")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                leading: Button("Close") {
+                    dismiss()
+                }
+            )
+        }
+    }
+}
+
+private struct CatalogItemImageView: View {
+    let image: URL?
+
+    var body: some View {
+        AsyncImage(url: image) { phase in
+            switch phase {
+            case .success(let image):
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            default:
+                ProgressView()
+            }
+        }
+        .clipped()
+    }
+}
+
+private struct CatalogItemDescriptionView: View {
+    let id: String
+    let text: String
+    let confidence: Float
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(text)
+            Text("ID: \(id)")
+            Text(String(format: "Confidence: %.2f", confidence))
+        }
     }
 }
 
