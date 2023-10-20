@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "3ECFB004-B95E-4155-98C5-CEE44354077E",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:DigiTest.xcodeproj",
+        "identifier" : "47D9E6142AE282D40057BD8E",
+        "name" : "DigiTestUnitTests"
+      }
+    }
+  ],
+  "version" : 1
+}

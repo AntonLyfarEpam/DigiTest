@@ -28,13 +28,13 @@ final class CatalogViewModel: ObservableObject {
     }
 
     func lastItemShown() {
-        loadItems(lastId: currentLastId)
+        loadItems(maxId: currentLastId)
     }
 
-    private func loadItems(lastId: String? = nil, refresh: Bool = false) {
+    private func loadItems(maxId: String? = nil, refresh: Bool = false) {
         isLoading = true
         itemsSubscription = repository
-            .retrieveItems(maxId: lastId, refresh: false)
+            .retrieveItems(maxId: maxId, refresh: refresh)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] entities in
                 self?.items = entities.map(\.item)
