@@ -84,24 +84,43 @@ private struct ItemDetailsView: View {
     let confidence: Float
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.verticalSizeClass) var verticalSizeClass: UserInterfaceSizeClass?
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass: UserInterfaceSizeClass?
+
 
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                CatalogItemImageView(image: image)
-                    .frame(height: 300)
-                    .padding()
+                if horizontalSizeClass == .compact && verticalSizeClass == .regular {
+                    CatalogItemImageView(image: image)
+                        .frame(height: 300)
+                        .padding()
 
-                HStack {
-                    CatalogItemDescriptionView(
-                        id: id,
-                        text: text,
-                        confidence: confidence
-                    )
-                    .padding()
+                    HStack {
+                        CatalogItemDescriptionView(
+                            id: id,
+                            text: text,
+                            confidence: confidence
+                        )
+                        .padding()
+                        Spacer()
+                    }
                     Spacer()
+                } else {
+                    HStack {
+                        CatalogItemImageView(image: image)
+                            .frame(width: 300, height: 300)
+                            .padding()
+
+                        CatalogItemDescriptionView(
+                            id: id,
+                            text: text,
+                            confidence: confidence
+                        )
+                        .padding()
+                        Spacer()
+                    }
                 }
-                Spacer()
             }
             .padding(.horizontal)
             .navigationTitle("Details")
