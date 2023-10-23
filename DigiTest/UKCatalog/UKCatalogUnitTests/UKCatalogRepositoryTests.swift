@@ -1,43 +1,26 @@
 //
-//  CatalogRepositoryTests.swift
+//  UKCatalogRepositoryTests.swift
 //  DigiTestUnitTests
 //
-//  Created by Anton Lyfar on 20.10.2023.
+//  Created by Anton Lyfar on 23.10.2023.
 //
 
-import Combine
 @testable import DigiTest
 
 import XCTest
 
-final class CatalogRepositoryTests: XCTestCase {
-    var sut: CatalogRepository!
-    private var catalogServiceMock: CatalogServiceMock!
+final class UKCatalogRepositoryTests: XCTestCase {
+    var sut: UKCatalogRepository!
+    private var catalogServiceMock: UKCatalogServiceMock!
     private var catalogStorageMock: CatalogStorageMock!
-
-    private let fetchItemsPublisher = PassthroughSubject<[CatalogItemResponseModel], Error>()
-    private var subscribers: Set<AnyCancellable> = []
-
-    override func setUp() {
-        super.setUp()
-
-        catalogServiceMock = CatalogServiceMock(subject: fetchItemsPublisher, onFetchCall: nil)
-        catalogStorageMock = CatalogStorageMock(onFetchCall: {[]}, onUpdateCall: { _ in .noChanges})
-
-        sut = DefaultCatalogRepository(
-            service: catalogServiceMock,
-            storage: catalogStorageMock
-        )
-    }
 
     override func tearDown() {
         super.tearDown()
 
         sut = nil
-        subscribers = []
     }
 
-    func test_retrieveItems_StorageEmpty_StorageUpdated() {
+    func test_requestItems_StorageEmpty_StorageUpdated() {
         let input: [CatalogItemResponseModel] = [
             .init(id: "1", text: "1", image: "url1", confidence: 0.1),
             .init(id: "2", text: "2", image: "url2", confidence: 0.2)
@@ -56,21 +39,21 @@ final class CatalogRepositoryTests: XCTestCase {
             }
         )
 
-        catalogServiceMock = CatalogServiceMock(
-            subject: fetchItemsPublisher,
-            onFetchCall: {
-                maxIdOutput = $0.maxId
-            }
+        catalogServiceMock = UKCatalogServiceMock(onRequestCall: {
+            maxIdOutput = $0
+            return .success(input)
+        })
+
+        sut = UKDefaultCatalogRepository(
+            service: catalogServiceMock,
+            storage: catalogStorageMock
         )
 
-        sut = DefaultCatalogRepository(service: catalogServiceMock, storage: catalogStorageMock)
-        sut.retrieveItems(maxId: nil, refresh: false)
-            .sink {
-                output = $0
-            }
-            .store(in: &subscribers)
-
-        fetchItemsPublisher.send(input)
+        sut.requestItems(
+            maxId: nil,
+            refresh: false,
+            completion: { output = $0 }
+        )
 
         XCTAssertNil(maxIdOutput)
         XCTAssertEqual(updateOutput.count, input.count)
@@ -94,7 +77,7 @@ final class CatalogRepositoryTests: XCTestCase {
         XCTAssertEqual(output.last?.confidence, input.last?.confidence)
     }
 
-    func test_retrieveItems_StorageNotEmpty_StorageUpdated() {
+    func test_requestItems_StorageNotEmpty_StorageUpdated() {
         let input: [CatalogItemResponseModel] = [
             .init(id: "3", text: "3", image: "ur3", confidence: 0.3),
             .init(id: "4", text: "4", image: "ur4", confidence: 0.4)
@@ -118,21 +101,21 @@ final class CatalogRepositoryTests: XCTestCase {
             }
         )
 
-        catalogServiceMock = CatalogServiceMock(
-            subject: fetchItemsPublisher,
-            onFetchCall: {
-                maxIdOutput = $0.maxId
-            }
+        catalogServiceMock = UKCatalogServiceMock(onRequestCall: {
+            maxIdOutput = $0
+            return .success(input)
+        })
+
+        sut = UKDefaultCatalogRepository(
+            service: catalogServiceMock,
+            storage: catalogStorageMock
         )
 
-        sut = DefaultCatalogRepository(service: catalogServiceMock, storage: catalogStorageMock)
-        sut.retrieveItems(maxId: nil, refresh: false)
-            .sink {
-                output = $0
-            }
-            .store(in: &subscribers)
-
-        fetchItemsPublisher.send(input)
+        sut.requestItems(
+            maxId: nil,
+            refresh: false,
+            completion: { output = $0 }
+        )
 
         XCTAssertNil(maxIdOutput)
         XCTAssertEqual(updateOutput.count, input.count)
@@ -159,7 +142,7 @@ final class CatalogRepositoryTests: XCTestCase {
         }
     }
 
-    func test_retrieveItems_StorageNotEmpty_StorageNotUpdated() {
+    func test_requestItems_StorageNotEmpty_StorageNotUpdated() {
         let expectation = XCTestExpectation(description: "items emitted")
         expectation.expectedFulfillmentCount = 1
         expectation.assertForOverFulfill = true
@@ -186,26 +169,29 @@ final class CatalogRepositoryTests: XCTestCase {
             }
         )
 
-        catalogServiceMock = CatalogServiceMock(
-            subject: fetchItemsPublisher,
-            onFetchCall: {
-                maxIdOutput = $0.maxId
-            }
+        catalogServiceMock = UKCatalogServiceMock(onRequestCall: {
+            maxIdOutput = $0
+            return .success(input)
+        })
+
+        sut = UKDefaultCatalogRepository(
+            service: catalogServiceMock,
+            storage: catalogStorageMock
         )
 
-        sut = DefaultCatalogRepository(service: catalogServiceMock, storage: catalogStorageMock)
-        sut.retrieveItems(maxId: nil, refresh: false)
-            .sink {
+        sut.requestItems(
+            maxId: nil,
+            refresh: false,
+            completion: {
                 output = $0
                 expectation.fulfill()
             }
-            .store(in: &subscribers)
+        )
 
-        fetchItemsPublisher.send(input)
         wait(for: [expectation], timeout: 1)
 
         XCTAssertNil(maxIdOutput)
-        
+
         XCTAssertEqual(output.count, storageInput.count)
 
         XCTAssertEqual(updateOutput.count, input.count)
@@ -219,7 +205,7 @@ final class CatalogRepositoryTests: XCTestCase {
         XCTAssertEqual(updateOutput.last?.confidence, input.last?.confidence)
     }
 
-    func test_retrieveItems_StorageNotEmpty_StorageNotUpdated_Refresh() {
+    func test_requestItems_StorageNotEmpty_StorageNotUpdated_Refresh() {
         let expectation = XCTestExpectation(description: "items emitted")
         expectation.expectedFulfillmentCount = 2
         expectation.assertForOverFulfill = true
@@ -246,22 +232,25 @@ final class CatalogRepositoryTests: XCTestCase {
             }
         )
 
-        catalogServiceMock = CatalogServiceMock(
-            subject: fetchItemsPublisher,
-            onFetchCall: {
-                maxIdOutput = $0.maxId
-            }
+        catalogServiceMock = UKCatalogServiceMock(onRequestCall: {
+            maxIdOutput = $0
+            return .success(input)
+        })
+
+        sut = UKDefaultCatalogRepository(
+            service: catalogServiceMock,
+            storage: catalogStorageMock
         )
 
-        sut = DefaultCatalogRepository(service: catalogServiceMock, storage: catalogStorageMock)
-        sut.retrieveItems(maxId: nil, refresh: true)
-            .sink {
+        sut.requestItems(
+            maxId: nil,
+            refresh: true,
+            completion: {
                 output = $0
                 expectation.fulfill()
             }
-            .store(in: &subscribers)
+        )
 
-        fetchItemsPublisher.send(input)
         wait(for: [expectation], timeout: 1)
 
         XCTAssertNil(maxIdOutput)
@@ -277,33 +266,16 @@ final class CatalogRepositoryTests: XCTestCase {
         XCTAssertEqual(updateOutput.last?.text, input.last?.text)
         XCTAssertEqual(updateOutput.last?.image, input.last?.image)
         XCTAssertEqual(updateOutput.last?.confidence, input.last?.confidence)
-
     }
 }
 
-private struct CatalogServiceMock: CatalogService {
-    struct Parameters {
-        let maxId: String?
-    }
+private struct UKCatalogServiceMock: UKCatalogService {
+    let onRequestCall: ((String?) -> Result<[CatalogItemResponseModel], Error>)
 
-    let subject: PassthroughSubject<[CatalogItemResponseModel], Error>
-    let onFetchCall: ((Parameters) -> Void)?
-
-    func fetchItems(maxId: String?) -> AnyPublisher<[CatalogItemResponseModel], Error> {
-        onFetchCall?(Parameters(maxId: maxId))
-        return subject.eraseToAnyPublisher()
-    }
-}
-
-struct CatalogStorageMock: CatalogStorage {
-    let onFetchCall: (() -> [CatalogItemDataModel])
-    let onUpdateCall: (([CatalogItemDataModel]) -> StorageUpdateResult)
-
-    func fetchItems() -> [CatalogItemDataModel] {
-        onFetchCall()
-    }
-    
-    func update(with items: [CatalogItemDataModel], onCompletion: @escaping (StorageUpdateResult) -> Void) {
-        onCompletion(onUpdateCall(items))
+    func requestItems(
+        maxId: String?,
+        completion: @escaping (Result<[CatalogItemResponseModel], Error>) -> Void
+    ) {
+        completion(onRequestCall(maxId))
     }
 }

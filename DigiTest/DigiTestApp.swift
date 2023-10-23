@@ -11,7 +11,18 @@ import SwiftUI
 struct DigiTestApp: App {
     var body: some Scene {
         WindowGroup {
-            CatalogView()
+            TabView {
+                UKCatalogView()
+                    .tabItem {
+                        Label("UIKit", systemImage: "square.3.layers.3d.down.right")
+
+                    }
+
+                CatalogView()
+                    .tabItem {
+                        Label("SwiftUI+Combine", systemImage: "swift")
+                    }
+            }
         }
     }
 }

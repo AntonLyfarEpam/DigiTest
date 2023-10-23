@@ -53,7 +53,6 @@ extension CatalogViewModel {
     }
 }
 
-
 private extension CatalogItemEntity {
     var item: CatalogViewModel.Item {
         .init(id: id, text: text, image: image, confidence: confidence)

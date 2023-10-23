@@ -16,17 +16,10 @@ class DefaultCatalogService: CatalogService {
     func fetchItems(maxId: String?) -> AnyPublisher<[CatalogItemResponseModel], Error> {
         ApiRequest.execute(
             url: URL(string: "https://marlove.net/e/mock/v1/items")!,
-            queryItems: queryItems(maxId: maxId)
+            queryItems: ApiRequest.queryItems(maxId: maxId)
         )
         .mapError { $0 }
         .eraseToAnyPublisher()
-    }
-
-    private func queryItems(maxId: String?) -> [URLQueryItem] {
-        var queryItems = [URLQueryItem]()
-        if let maxId { queryItems.append(URLQueryItem(name: "max_id", value: maxId)) }
-
-        return queryItems
     }
 }
 
@@ -41,5 +34,14 @@ struct CatalogItemResponseModel: Codable {
         case text
         case image
         case confidence
+    }
+}
+
+extension ApiRequest {
+    static func queryItems(maxId: String?) -> [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        if let maxId { queryItems.append(URLQueryItem(name: "max_id", value: maxId)) }
+
+        return queryItems
     }
 }

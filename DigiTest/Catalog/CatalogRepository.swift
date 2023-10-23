@@ -54,25 +54,12 @@ extension DefaultCatalogRepository: CatalogRepository {
                         if refresh || result == .itemsUpdated {
                             let entities = storage.fetchItems().map(\.entity)
                             promise(.success(entities))
-                        } else {
-                            promise(.success([]))
                         }
                     }
                 }
             }
             .filter { $0.isEmpty == false }
             .eraseToAnyPublisher()
-    }
-
-    private func updateStorage(
-        with models: [CatalogItemResponseModel]
-    ) -> AnyPublisher<[CatalogItemResponseModel], Never> {
-        Future { [storage] promise in
-            storage.update(with: models.map(\.dataModel)) { result in
-                promise(.success(result == .itemsUpdated ? models : []))
-            }
-        }
-        .eraseToAnyPublisher()
     }
 }
 
@@ -83,7 +70,7 @@ struct CatalogItemEntity: Codable {
     let confidence: Float
 }
 
-private extension CatalogItemResponseModel {
+extension CatalogItemResponseModel {
     var dataModel: CatalogItemDataModel {
         .init(id: id, text: text, image: image, confidence: confidence)
     }
@@ -93,7 +80,7 @@ private extension CatalogItemResponseModel {
     }
 }
 
-private extension CatalogItemDataModel {
+extension CatalogItemDataModel {
     var entity: CatalogItemEntity {
         .init(id: id, text: text, image: imageURL, confidence: confidence)
     }

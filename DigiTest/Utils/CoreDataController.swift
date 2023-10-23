@@ -26,7 +26,5 @@ struct CoreDataController {
         container.viewContext.automaticallyMergesChangesFromParent = true
         managedContext = container.viewContext
         privateContext = container.newBackgroundContext()
-//        privateContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-
     }
 }
